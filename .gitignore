@@ -1,0 +1,6 @@
+grafana/
+prometheus/
+.env
+dashboard.docx
+docker-compose.yml
+monitoring.docx
