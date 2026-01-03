@@ -6,16 +6,44 @@ pipeline {
     }
 
     stages {
-        stage('build') {
+        stage('Build') {
             steps {
                 echo '--------start build--------'
+
+                dir('frontend') {
+                    echo 'Building Frontend...'
+                    sh 'npm install'
+                }
+                
+                dir('backend') {
+                    echo 'Building Backend...'
+                    sh 'npm install'
+                }
+
                 echo '--------end build--------'
+            }
+        }
+
+        stage('Test') { 
+            steps {
+                echo '--------start test--------'
+                sh 'bash ./scripts/test.sh'
+                echo '--------end test--------'
+            }
+        }
+
+        stage('Deliver') {
+            steps {
+                echo '--------start delivery--------'
+                sh 'bash ./scripts/deliver.sh'
+                echo '--------end delivery--------'
             }
         }
 
         stage('SonarQube analysis') {
             environment {
-            def scannerHome = tool 'sonarqube_scaner';
+            //def scannerHome = tool 'sonarqube_scaner';
+            scannerHome = tool 'sonarqube_scaner'
             }
             steps {
             withSonarQubeEnv('sonarqube_server') { // If you have configured more than one global server connection, you can specify its name
