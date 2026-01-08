@@ -62,33 +62,25 @@ pipeline {
             }
         }}}
 
-        environment {
-        FRONTEND_IMAGE = "nazarito0/fullstack-frontend"
-        BACKEND_IMAGE  = "nazarito0/fullstack-backend"
-        BUILD_TAG      = "${env.BUILD_NUMBER}"
-        }
-
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/nazarito0/fullstack'
             }
         }
 
-        stage('Build & Push Images') {
+        stage('Build and Push Images') {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
 
                         dir('frontend') {
-                            def frontendImage = docker.build("${FRONTEND_IMAGE}:${BUILD_TAG}")
+                            def frontendImage = docker.build("nazarito0/fullstack-frontend:${env.BUILD_NUMBER}")
                             frontendImage.push()
-                            frontendImage.push('latest')
                         }
 
                         dir('backend') {
-                            def backendImage = docker.build("${BACKEND_IMAGE}:${BUILD_TAG}")
+                            def backendImage = docker.build("nazarito0/fullstack-backend:${env.BUILD_NUMBER}")
                             backendImage.push()
-                            backendImage.push('latest')
                         }
                     }
                 }
