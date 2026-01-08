@@ -6,7 +6,7 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Build app') {
             steps {
                 echo '--------start build--------'
 
@@ -43,7 +43,6 @@ pipeline {
         stage('SonarQube analysis') {
             environment {
             def scannerHome = tool 'sonarqube_scaner';
-            //scannerHome = tool 'sonarqube_scaner'
             }
             steps {
             withSonarQubeEnv('sonarqube_server') { // If you have configured more than one global server connection, you can specify its name
@@ -62,5 +61,46 @@ pipeline {
                 }
             }
         }}}
+
+        environment {
+        FRONTEND_IMAGE = "nazarito0/fullstack-frontend"
+        BACKEND_IMAGE  = "nazarito0/fullstack-backend"
+        BUILD_TAG      = "${env.BUILD_NUMBER}"
+        }
+
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/nazarito0/fullstack'
+            }
+        }
+
+        stage('Build frontend image') {
+            steps {
+                script {
+                    def frontendImage = docker.build("${FRONTEND_IMAGE}:${BUILD_TAG}", "./frontend")
+                    frontendImage.push()
+                    frontendImage.push('latest')
+                }
+            }
+        }
+
+        stage('Build backend image') {
+            steps {
+                script {
+                    def backendImage = docker.build("${BACKEND_IMAGE}:${BUILD_TAG}", "./backend")
+                    backendImage.push()
+                    backendImage.push('latest')
+                }
+            }
+        }
+
+        //stage('Push images') {
+        //    steps {
+        //        script {
+        //            docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+        //                dockerImage.push()
+        //        }
+        //    }
+        //}}
     }
 }
