@@ -74,33 +74,25 @@ pipeline {
             }
         }
 
-        stage('Build frontend image') {
+        stage('Build & Push Images') {
             steps {
                 script {
-                    def frontendImage = docker.build("${FRONTEND_IMAGE}:${BUILD_TAG}", "./frontend")
-                    frontendImage.push()
-                    frontendImage.push('latest')
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+
+                        dir('frontend') {
+                            def frontendImage = docker.build("${FRONTEND_IMAGE}:${BUILD_TAG}")
+                            frontendImage.push()
+                            frontendImage.push('latest')
+                        }
+
+                        dir('backend') {
+                            def backendImage = docker.build("${BACKEND_IMAGE}:${BUILD_TAG}")
+                            backendImage.push()
+                            backendImage.push('latest')
+                        }
+                    }
                 }
             }
         }
-
-        stage('Build backend image') {
-            steps {
-                script {
-                    def backendImage = docker.build("${BACKEND_IMAGE}:${BUILD_TAG}", "./backend")
-                    backendImage.push()
-                    backendImage.push('latest')
-                }
-            }
-        }
-
-        //stage('Push images') {
-        //    steps {
-        //        script {
-        //            docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-        //                dockerImage.push()
-        //        }
-        //    }
-        //}}
     }
 }
