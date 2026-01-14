@@ -32,14 +32,6 @@ pipeline {
             }
         }
 
-        stage('Deliver') {
-            steps {
-                echo '--------start delivery--------'
-                sh 'bash ./scripts/deliver.sh'
-                echo '--------end delivery--------'
-            }
-        }
-
         stage('SonarQube analysis') {
             environment {
             def scannerHome = tool 'sonarqube_scaner';
