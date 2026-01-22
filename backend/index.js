@@ -17,6 +17,26 @@ const pool = new Pool({
   port: 5432,
 });
 
+// ФУНКЦІЯ ІНІЦІАЛІЗАЦІЇ ТАБЛИЦЬ
+const initDB = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+  try {
+    await pool.query(createTableQuery);
+    console.log("Таблиця users готова або вже існувала");
+  } catch (err) {
+    console.error("Помилка при створенні таблиці:", err);
+  }
+};
+
+// Запускаємо ініціалізацію
+initDB();
+
 app.get("/", (req, res) => {
   res.send("Express Backend");
 });
