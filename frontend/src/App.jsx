@@ -7,7 +7,7 @@ function App() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://backend.com:5000/users')
+      const response = await fetch('/api/users')
       const data = await response.json()
       setUsers(data)
     } catch (error) {
@@ -24,7 +24,7 @@ function App() {
     if (!name) return
 
     try {
-      const response = await fetch('http://backend.com:5000/users', {
+      const response = await fetch('/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
